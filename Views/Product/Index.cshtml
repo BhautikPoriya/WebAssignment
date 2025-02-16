@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "Product List";
+}
+
+<h2>Product List</h2>
+
+<div id="productContainer">
+    @Html.Partial("_ProductList", new List<Product>()) <!-- Initially Empty -->
+</div>
+
+<h3>Add New Product</h3>
+<form id="addProductForm">
+    <label>Name:</label>
+    <input type="text" id="name" required />
+    <br />
+    <label>Price:</label>
+    <input type="number" id="price" step="0.01" required />
+    <br />
+    <button type="submit">Add Product</button>
+</form>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            loadProducts();// Load products on page load
+
+            $("#addProductForm").submit(function (event) {
+                event.preventDefault();// Prevent full page reload
+
+                var productName = $("#name").val();
+                var productPrice = $("#price").val();
+
+                $.post("/Product/AddProduct", { name: productName, price: productPrice }, function (data) {
+                    $("#productContainer").html(data); // Update product list dynamically
+                    $("#name").val("");// Clear input fields
+                    $("#price").val("");
+                });
+            });
+
+            function loadProducts() {
+                $.get("/Product/GetProducts", function (data) {
+                    $("#productContainer").html(data);
+                });
+            }
+        });
+    </script>
+}
